@@ -3,7 +3,7 @@
 # by Christoph Barth 2019
 # a simple script that generates a scale on a given root
 
-# TODO: Chords, pentatonic (needs separate function)
+# TODO: Chords
 # FIXME: some note names are not correct, for example "ees" should be "es" 
 
 # the note names. The second value is their relative distance to c
@@ -24,7 +24,6 @@ major_scale = [ 2, 2, 1, 2, 2, 2, 1 ]
 minor_scale = [ 2, 1, 2, 2, 1, 2, 2 ]
 # hungarian minor:
 hungarian_minor_scale = [ 2, 1, 3, 1, 1, 3, 1 ]
-# minor pentatonic:
 
 def distance_from_c(note):
     # calculates the distance from the next lower c for a given note:
@@ -80,8 +79,20 @@ def get_scale(intervals, rootnote):
         scale.append(note)
     return scale
 
+def minor_pent(scale):
+    scale.remove(scale[1])
+    scale.remove(scale[4])
+    return scale
+
+def major_pent(scale):
+    scale.remove(scale[3])
+    scale.remove(scale[5])
+    return scale
+
 if __name__ == "__main__":
     print(get_scale(minor_scale, "bes"))
     print(get_scale(major_scale, "d"))
     print(get_scale(minor_scale, "c"))
     print(get_scale(hungarian_minor_scale, "a"))
+    print(minor_pent(get_scale(minor_scale, "e")))
+    print(major_pent(get_scale(major_scale, "g")))
