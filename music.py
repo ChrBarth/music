@@ -45,16 +45,14 @@ def get_scale(intervals, rootnote):
     notes_index     = notes_list.index(rootnote[0])
     # save the previous index here so we can calculate the distance
     previous_index  = notes_index
-    # we need to keep track of this when we get to the next octave
-    octave          = 0
-    previous_octave = octave
 
     # walk down the intervals:
     for step in intervals:
+        octave_skip = False
         notes_index +=  1
         if notes_index >= len(notes):
             notes_index = 0
-            octave += 1
+            octave_skip = True
         note = notes_list[notes_index]
 
         # calculate the distance between the current note and the previous note
@@ -63,7 +61,7 @@ def get_scale(intervals, rootnote):
         prev_dist_from_c = distance_from_c(scale[-1])
         dist = dist_from_c - prev_dist_from_c
         # are we skipping an octave?
-        if octave > previous_octave:
+        if octave_skip:
             dist += 12
 
         if dist > step:
@@ -78,11 +76,11 @@ def get_scale(intervals, rootnote):
                 note = note + "is"
 
         previous_index  = notes_index
-        previous_octave = octave
         scale.append(note)
     return scale
 
 print(get_scale(major_scale, "d"))
 print(get_scale(minor_scale, "c"))
 print(get_scale(hungarian_minor_scale, "a"))
-
+print(get_scale(major_scale, "e"))
+print(get_scale(minor_scale, "ces"))
