@@ -4,6 +4,11 @@
 # a simple script that generates a scale on a given root
 
 # FIXME: some note names are not correct, for example "ees" should be "es" 
+# TODO: add more chords/scales, argparse so we can actually use this
+#       for something useful :)
+# scales to implement:
+#   whole tone scale
+#   altered scale
 
 # the note names. The second value is their relative distance to c
 # so we know when to use flat/sharp notes:
@@ -39,6 +44,16 @@ dom7_chord  = [ [2, 4], [2, 3], [2, 3] ]
 maj7_chord  = [ [2, 4], [2, 3], [2, 4] ]
 min7_chord  = [ [2, 3], [2, 4], [2, 3] ]
 dim_chord   = [ [2, 3], [2, 3] ]
+
+# specials:
+
+# circle of fifths:
+circle_of_fifths      = [ [4, 7], [4, 7], [4, 7], [4, 7], [4, 7], [4, 7], [4, 7], [4, 7] ]
+circle_of_fifths_flat = [ [3, 5], [3, 5], [3, 5], [3, 5], [3, 5], [3, 5], [3, 5], [3, 5] ]
+
+# parallel major/minor:
+parallel_major = [ [2, 3] ]
+parallel_minor = [ [5, 9] ]
 
 def distance_from_c(note):
     # calculates the distance from the next lower c for a given note:
@@ -95,14 +110,19 @@ def get_notes(intervals, rootnote):
     return ret_notes
 
 if __name__ == "__main__":
-    print(get_notes(minor_pent, "e"))
-    print(get_notes(major_pent, "a"))
-    print(get_notes(major_chord, "d"))
-    print(get_notes(minor_chord, "c"))
-    print(get_notes(dom7_chord, "a"))
-    print(get_notes(maj7_chord, "f"))
-    print(get_notes(dim_chord, "g"))
-    print(get_notes(min7_chord, "dis"))
-    print(get_notes(major_scale, "d"))
-    print(get_notes(minor_scale, "cis"))
-    print(get_notes(hungarian_minor_scale, "a"))
+    print("examples:\n")
+    print("e minor parallel -> {} major". format(get_notes(parallel_major, "e")[1]))
+    print("b major parallel -> {} minor". format(get_notes(parallel_minor, "b")[1]))
+    print("circle of fifths (#): ",get_notes(circle_of_fifths, "c"))
+    print("circle of fifths (b): ",get_notes(circle_of_fifths_flat, "c"))
+    print("e minor pentatonic: ", get_notes(minor_pent, "e"))
+    print("a major pentatonic: ", get_notes(major_pent, "a"))
+    print("d major chord: ", get_notes(major_chord, "d"))
+    print("c minor chord: ", get_notes(minor_chord, "c"))
+    print("a dominant7 chord: ", get_notes(dom7_chord, "a"))
+    print("f major7 chord: ", get_notes(maj7_chord, "f"))
+    print("g diminished chord: ", get_notes(dim_chord, "g"))
+    print("dis minor7 chord: ", get_notes(min7_chord, "dis"))
+    print("d major scale: ", get_notes(major_scale, "d"))
+    print("cis minor scale: ", get_notes(minor_scale, "cis"))
+    print("a hungarian minor scale: ", get_notes(hungarian_minor_scale, "a"))
