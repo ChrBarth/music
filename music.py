@@ -3,7 +3,9 @@
 # by Christoph Barth 2019
 # a simple script that generates a scale on a given root
 
-# TODO: Chords
+# TODO: make scales the same as chords so we can use on function (get_chord)
+#       because after all we are always returning a list of note names, the
+#       only difference is the number of elements...
 # FIXME: some note names are not correct, for example "ees" should be "es" 
 
 # the note names. The second value is their relative distance to c
