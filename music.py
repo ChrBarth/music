@@ -3,9 +3,6 @@
 # by Christoph Barth 2019
 # a simple script that generates a scale on a given root
 
-# TODO: make scales the same as chords so we can use on function (get_chord)
-#       because after all we are always returning a list of note names, the
-#       only difference is the number of elements...
 # FIXME: some note names are not correct, for example "ees" should be "es" 
 
 # the note names. The second value is their relative distance to c
@@ -18,18 +15,24 @@ notes     = { 'c': 0,
               'a': 9,
               'b':11 }
 
+# scales and chords are stored in a nested list with 2 elements:
+# the step between two notes (1 = one step up = c-d, e-f etc.)
+# and their distance in half-tones
+
 # define some scales:
 
 # major scale:
-major_scale = [ 2, 2, 1, 2, 2, 2, 1 ]
+major_scale = [ [1, 2], [1, 2], [1, 1], [1, 2], [1, 2], [1, 2], [1, 1] ]
+# major pentatonic:
+major_pent  = [ [1, 2], [1, 2], [2, 3], [1, 2], [2, 3] ]
 # minor scale:
-minor_scale = [ 2, 1, 2, 2, 1, 2, 2 ]
+minor_scale = [ [1, 2], [1, 1], [1, 2], [1, 2], [1, 1], [1, 2], [1, 2] ]
+# minor pentatonic:
+minor_pent  = [ [2, 3], [1, 2], [1, 2], [2, 3], [1, 2] ]
 # hungarian minor:
-hungarian_minor_scale = [ 2, 1, 3, 1, 1, 3, 1 ]
+hungarian_minor_scale = [ [1, 2], [1, 1], [1, 3], [1, 1], [1, 1], [1, 3], [1, 1] ]
 
 # chords:
-# (they are different, since we need to store 2 things:
-# the interval between two notes and their distance in half-tones
 major_chord = [ [2, 4], [2, 3] ]
 minor_chord = [ [2, 3], [2, 4] ]
 dom7_chord  = [ [2, 4], [2, 3], [2, 3] ]
@@ -48,9 +51,9 @@ def distance_from_c(note):
     dist = basedist + stepsup - stepsdown
     return dist
 
-def get_chord(intervals, rootnote):
+def get_notes(intervals, rootnote):
     # intervals is the list (like in major_scale[]) of intervals,
-    chord = [rootnote]
+    ret_notes = [rootnote]
     # create a list out of the notes ( [c,d,e,f,g,a,b] ):
     notes_list      = list(notes.keys())
     # get the index of the scale's rootnote:
@@ -70,7 +73,7 @@ def get_chord(intervals, rootnote):
         # calculate the distance between the current note and the previous note
         # and add "is" or "es" if needed:
         dist_from_c      = distance_from_c(note)
-        prev_dist_from_c = distance_from_c(chord[-1])
+        prev_dist_from_c = distance_from_c(ret_notes[-1])
         dist = dist_from_c - prev_dist_from_c
         # are we skipping an octave?
         if octave_skip:
@@ -88,76 +91,18 @@ def get_chord(intervals, rootnote):
                 note = note + "is"
 
         previous_index  = notes_index
-        chord.append(note)
-    return chord
-
-def get_scale(intervals, rootnote):
-    # intervals is the list (like in major_scale[]) of intervals,
-    scale = [rootnote]
-    # create a list out of the notes ( [c,d,e,f,g,a,b] ):
-    notes_list      = list(notes.keys())
-    # get the index of the scale's rootnote:
-    notes_index     = notes_list.index(rootnote[0])
-    # save the previous index here so we can calculate the distance
-    previous_index  = notes_index
-
-    # walk down the intervals:
-    for step in intervals:
-        octave_skip = False
-        notes_index +=  1
-        if notes_index >= len(notes):
-            notes_index = 0
-            octave_skip = True
-        note = notes_list[notes_index]
-
-        # calculate the distance between the current note and the previous note
-        # and add "is" or "es" if needed:
-        dist_from_c      = distance_from_c(note)
-        prev_dist_from_c = distance_from_c(scale[-1])
-        dist = dist_from_c - prev_dist_from_c
-        # are we skipping an octave?
-        if octave_skip:
-            dist += 12
-
-        if dist > step:
-            # distance between current and previous note
-            # is too big, so add one or more "es" to the note:
-            for i in range(dist-step):
-                note = note + "es"
-        elif step > dist:
-            # distance between current and previous note
-            # is too small, so add one or more "is" to the note:
-            for i in range(step-dist):
-                note = note + "is"
-
-        previous_index  = notes_index
-        scale.append(note)
-    return scale
-
-def minor_pent(scale):
-    # just pass it a minor scale and remove
-    # the 2nd and 6th position
-    scale.remove(scale[1])
-    scale.remove(scale[4])
-    return scale
-
-def major_pent(scale):
-    # same as above, but pass a major scale
-    # and remove the 4th and 7th position
-    scale.remove(scale[3])
-    scale.remove(scale[5])
-    return scale
+        ret_notes.append(note)
+    return ret_notes
 
 if __name__ == "__main__":
-    print(get_chord(major_chord, "d"))
-    print(get_chord(minor_chord, "c"))
-    print(get_chord(dom7_chord, "a"))
-    print(get_chord(maj7_chord, "f"))
-    print(get_chord(dim_chord, "g"))
-    print(get_chord(min7_chord, "dis"))
-    print(get_scale(minor_scale, "bes"))
-    print(get_scale(major_scale, "d"))
-    print(get_scale(minor_scale, "c"))
-    print(get_scale(hungarian_minor_scale, "a"))
-    print(minor_pent(get_scale(minor_scale, "e")))
-    print(major_pent(get_scale(major_scale, "g")))
+    print(get_notes(minor_pent, "e"))
+    print(get_notes(major_pent, "a"))
+    print(get_notes(major_chord, "d"))
+    print(get_notes(minor_chord, "c"))
+    print(get_notes(dom7_chord, "a"))
+    print(get_notes(maj7_chord, "f"))
+    print(get_notes(dim_chord, "g"))
+    print(get_notes(min7_chord, "dis"))
+    print(get_notes(major_scale, "d"))
+    print(get_notes(minor_scale, "cis"))
+    print(get_notes(hungarian_minor_scale, "a"))
