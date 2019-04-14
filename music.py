@@ -3,7 +3,13 @@
 # by Christoph Barth 2019
 # a simple script that generates a scale on a given root
 
-# FIXME: some note names are not correct, for example "ees" should be "es" 
+# FIXME: some note names are not correct, for example "ees" should be "es", 
+#        since I am aiming at lilypond-output and this seems to be ok,
+#        this will not be fixed I think. Maybe I'll add some conversion function
+#        that makes "c-flat" out of "ces"...
+#        see here: http://lilypond.org/doc/v2.18/Documentation/music-glossary/pitch-names
+#        and here: http://lilypond.org/doc/v2.18/Documentation/notation/writing-pitches#note-names-in-other-languages
+
 # TODO: add more chords/scales, argparse so we can actually use this
 #       for something useful :)
 # scales to implement:
@@ -32,10 +38,26 @@ major_scale = [ [1, 2], [1, 2], [1, 1], [1, 2], [1, 2], [1, 2], [1, 1] ]
 major_pent  = [ [1, 2], [1, 2], [2, 3], [1, 2], [2, 3] ]
 # minor scale:
 minor_scale = [ [1, 2], [1, 1], [1, 2], [1, 2], [1, 1], [1, 2], [1, 2] ]
+# harmonic minor scale:
+harmonic_minor_scale = [ [1, 2], [1, 1], [1, 2], [1, 2], [1, 1], [1, 3], [1, 1] ]
 # minor pentatonic:
 minor_pent  = [ [2, 3], [1, 2], [1, 2], [2, 3], [1, 2] ]
 # hungarian minor:
 hungarian_minor_scale = [ [1, 2], [1, 1], [1, 3], [1, 1], [1, 1], [1, 3], [1, 1] ]
+
+# modes:
+ionian_scale = major_scale
+dorian_scale = ionian_scale[1:]
+dorian_scale.append(ionian_scale[0])
+phrygian_scale = dorian_scale[1:]
+phrygian_scale.append(dorian_scale[0])
+lydian_scale = phrygian_scale[1:]
+lydian_scale.append(phrygian_scale[0])
+mixolydian_scale = lydian_scale[1:]
+mixolydian_scale.append(lydian_scale[0])
+aeolian_scale = minor_scale
+locrian_scale = minor_scale[1:]
+locrian_scale.append(minor_scale[0])
 
 # chords:
 major_chord = [ [2, 4], [2, 3] ]
@@ -44,6 +66,8 @@ dom7_chord  = [ [2, 4], [2, 3], [2, 3] ]
 maj7_chord  = [ [2, 4], [2, 3], [2, 4] ]
 min7_chord  = [ [2, 3], [2, 4], [2, 3] ]
 dim_chord   = [ [2, 3], [2, 3] ]
+aug_chord   = [ [2, 4], [2, 4] ]
+ninth_chord = [ [2, 4], [2, 3], [2, 3], [2, 4] ]
 
 # specials:
 
@@ -113,16 +137,26 @@ if __name__ == "__main__":
     print("examples:\n")
     print("e minor parallel -> {} major". format(get_notes(parallel_major, "e")[1]))
     print("b major parallel -> {} minor". format(get_notes(parallel_minor, "b")[1]))
-    print("circle of fifths (#): ",get_notes(circle_of_fifths, "c"))
-    print("circle of fifths (b): ",get_notes(circle_of_fifths_flat, "c"))
-    print("e minor pentatonic: ", get_notes(minor_pent, "e"))
-    print("a major pentatonic: ", get_notes(major_pent, "a"))
-    print("d major chord: ", get_notes(major_chord, "d"))
-    print("c minor chord: ", get_notes(minor_chord, "c"))
-    print("a dominant7 chord: ", get_notes(dom7_chord, "a"))
-    print("f major7 chord: ", get_notes(maj7_chord, "f"))
-    print("g diminished chord: ", get_notes(dim_chord, "g"))
-    print("dis minor7 chord: ", get_notes(min7_chord, "dis"))
-    print("d major scale: ", get_notes(major_scale, "d"))
-    print("cis minor scale: ", get_notes(minor_scale, "cis"))
-    print("a hungarian minor scale: ", get_notes(hungarian_minor_scale, "a"))
+    print("circle of fifths (#): ", *get_notes(circle_of_fifths, "c"))
+    print("circle of fifths (b): ", *get_notes(circle_of_fifths_flat, "c"))
+    print("d major chord: ", *get_notes(major_chord, "d"))
+    print("c minor chord: ", *get_notes(minor_chord, "c"))
+    print("a dominant7 chord: ", *get_notes(dom7_chord, "a"))
+    print("f major7 chord: ", *get_notes(maj7_chord, "f"))
+    print("g diminished chord: ", *get_notes(dim_chord, "g"))
+    print("dis minor7 chord: ", *get_notes(min7_chord, "dis"))
+    print("c augmented chord: ", *get_notes(aug_chord, "c"))
+    print("g ninth chord: ", *get_notes(ninth_chord, "g"))
+    print("d major scale: ", *get_notes(major_scale, "d"))
+    print("cis minor scale: ", *get_notes(minor_scale, "cis"))
+    print("a harmonic minor scale: ", *get_notes(harmonic_minor_scale, "a"))
+    print("a hungarian minor scale: ", *get_notes(hungarian_minor_scale, "a"))
+    print("e minor pentatonic: ", *get_notes(minor_pent, "e"))
+    print("a major pentatonic: ", *get_notes(major_pent, "a"))
+    print("e ionian scale: ", *get_notes(ionian_scale, "e"))
+    print("e dorian scale: ", *get_notes(dorian_scale, "e"))
+    print("e phrygian scale: ", *get_notes(phrygian_scale, "e"))
+    print("e lydian scale: ", *get_notes(lydian_scale, "e"))
+    print("e mixolydian scale: ", *get_notes(mixolydian_scale, "e"))
+    print("e aeolian scale: ", *get_notes(aeolian_scale, "e"))
+    print("e locrian scale: ", *get_notes(locrian_scale, "e"))
