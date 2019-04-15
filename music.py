@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+from midiutil import MIDIFile
 
 # by Christoph Barth 2019
 # a simple script that generates a scale on a given root
@@ -46,6 +47,8 @@ minor_pent  = [ [2, 3], [1, 2], [1, 2], [2, 3], [1, 2] ]
 hungarian_minor_scale = [ [1, 2], [1, 1], [1, 3], [1, 1], [1, 1], [1, 3], [1, 1] ]
 
 # modes:
+# can be easily calculated from the major scale
+# ionian and aeolian added just for completeness:
 ionian_scale = major_scale
 dorian_scale = ionian_scale[1:]
 dorian_scale.append(ionian_scale[0])
@@ -90,7 +93,7 @@ def distance_from_c(note):
     dist = basedist + stepsup - stepsdown
     return dist
 
-def get_notes(intervals, rootnote):
+def get_notes(intervals, rootnote, midi=False):
     # intervals is the list (like in major_scale[]) of intervals,
     ret_notes = [rootnote]
     # create a list out of the notes ( [c,d,e,f,g,a,b] ):
@@ -99,6 +102,8 @@ def get_notes(intervals, rootnote):
     notes_index     = notes_list.index(rootnote[0])
     # save the previous index here so we can calculate the distance
     previous_index  = notes_index
+    # generating MIDI-Data:
+    midi_notes = [60 + distance_from_c(rootnote)]
 
     # walk down the intervals:
     for interval, step in intervals:
@@ -129,10 +134,35 @@ def get_notes(intervals, rootnote):
             for i in range(step-dist):
                 note = note + "is"
 
+        midi_val = 60 + distance_from_c(note)
+        if octave_skip:
+            midi_val += 12
         previous_index  = notes_index
+        midi_notes.append(midi_val)
         ret_notes.append(note)
-    return ret_notes
+    if midi == True:
+        return midi_notes
+    else:
+        return ret_notes
 
+def writeMidi(notes, filename):
+    # stolen from MIDIUtil-examples:
+    track    = 0
+    channel  = 0
+    time     = 0
+    duration = 1
+    tempo    = 80
+    volume   = 100
+
+    MyMidi = MIDIFile(1)
+    MyMidi.addTempo(track, time, tempo)
+
+    for i, pitch in enumerate(notes):
+        MyMidi.addNote(track, channel, pitch, time+i, duration, volume)
+
+    with open(filename, "wb") as outfile:
+        MyMidi.writeFile(outfile)
+    
 if __name__ == "__main__":
     print("examples:\n")
     print("e minor parallel -> {} major". format(get_notes(parallel_major, "e")[1]))
@@ -160,3 +190,7 @@ if __name__ == "__main__":
     print("e mixolydian scale: ", *get_notes(mixolydian_scale, "e"))
     print("e aeolian scale: ", *get_notes(aeolian_scale, "e"))
     print("e locrian scale: ", *get_notes(locrian_scale, "e"))
+    print("c major scale midi: ", *get_notes(major_scale, "c", midi=True))
+
+    print("creating c-major.mid:")
+    writeMidi(get_notes(major_scale, "c", midi=True), "c-major.mid")
