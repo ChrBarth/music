@@ -193,4 +193,4 @@ if __name__ == "__main__":
     print("c major scale midi: ", *get_notes(major_scale, "c", midi=True))
 
     print("creating c-major.mid:")
-    writeMidi(get_notes(major_scale, "c", midi=True), "c-major.mid")
+    #writeMidi(get_notes(major_scale, "c", midi=True), "c-major.mid")
