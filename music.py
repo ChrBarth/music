@@ -30,6 +30,7 @@ notes     = { 'c': 0,
 # scales and chords are stored in a nested list with 2 elements:
 # the step between two notes (1 = one step up = c-d, e-f etc.)
 # and their distance in half-tones
+# for downward-movement (melodic minor) we use negative values for step
 
 # define some scales:
 
@@ -45,6 +46,9 @@ harmonic_minor_scale = [ [1, 2], [1, 1], [1, 2], [1, 2], [1, 1], [1, 3], [1, 1] 
 minor_pent  = [ [2, 3], [1, 2], [1, 2], [2, 3], [1, 2] ]
 # hungarian minor:
 hungarian_minor_scale = [ [1, 2], [1, 1], [1, 3], [1, 1], [1, 1], [1, 3], [1, 1] ]
+# melodic minor (special: ascending notes differ from descending ones)
+melodic_minor_scale = [ [1, 2], [1, 1], [1, 2], [1, 2], [1, 2], [1, 2], [1, 1],
+                        [-1, 2], [-1, 2], [-1, 1], [-1 ,2], [-1, 2], [-1, 1], [-1, 2] ]
 
 # modes:
 # can be easily calculated from the major scale
@@ -103,22 +107,35 @@ def get_notes(intervals, rootnote, midi=False):
     # save the previous index here so we can calculate the distance
     previous_index  = notes_index
     # generating MIDI-Data:
+    # always starting at the c' octave:
     midi_notes = [60 + distance_from_c(rootnote)]
+    octave     = 0
 
     # walk down the intervals:
     for interval, step in intervals:
-        octave_skip = False
-        notes_index +=  interval
+        octave_skip      = False
+
+        notes_index += interval
+
         if notes_index >= len(notes):
             notes_index = notes_index % len(notes)
             octave_skip = True
+            octave += 1
+        if notes_index<0:
+            notes_index = len(notes) + notes_index
+            octave_skip = True
+            octave -= 1
+
         note = notes_list[notes_index]
 
         # calculate the distance between the current note and the previous note
         # and add "is" or "es" if needed:
         dist_from_c      = distance_from_c(note)
         prev_dist_from_c = distance_from_c(ret_notes[-1])
-        dist = dist_from_c - prev_dist_from_c
+        if interval >= 0:
+            dist = dist_from_c - prev_dist_from_c
+        else:
+            dist = prev_dist_from_c - dist_from_c
         # are we skipping an octave?
         if octave_skip:
             dist += 12
@@ -134,9 +151,8 @@ def get_notes(intervals, rootnote, midi=False):
             for i in range(step-dist):
                 note = note + "is"
 
-        midi_val = 60 + distance_from_c(note)
-        if octave_skip:
-            midi_val += 12
+        midi_val = 60 + 12*octave + distance_from_c(note)
+
         previous_index  = notes_index
         midi_notes.append(midi_val)
         ret_notes.append(note)
@@ -179,6 +195,7 @@ if __name__ == "__main__":
     print("g ninth chord: ", *get_notes(ninth_chord, "g"))
     print("d major scale: ", *get_notes(major_scale, "d"))
     print("cis minor scale: ", *get_notes(minor_scale, "cis"))
+    print("a melodic minor scale: ", *get_notes(melodic_minor_scale, "a"))
     print("a harmonic minor scale: ", *get_notes(harmonic_minor_scale, "a"))
     print("a hungarian minor scale: ", *get_notes(hungarian_minor_scale, "a"))
     print("e minor pentatonic: ", *get_notes(minor_pent, "e"))
@@ -192,5 +209,7 @@ if __name__ == "__main__":
     print("e locrian scale: ", *get_notes(locrian_scale, "e"))
     print("c major scale midi: ", *get_notes(major_scale, "c", midi=True))
 
-    print("creating c-major.mid:")
+    #print("creating c-major.mid:")
     #writeMidi(get_notes(major_scale, "c", midi=True), "c-major.mid")
+    #print("create a-melodic-minor.mid:")
+    #writeMidi(get_notes(melodic_minor_scale, "a", midi=True), "a-melodic-minor.mid")
