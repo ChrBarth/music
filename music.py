@@ -179,10 +179,13 @@ def writeMidi(notes, filename):
     with open(filename, "wb") as outfile:
         MyMidi.writeFile(outfile)
 
-def createLilyPond(notes):
+def createLilyPond(notes, snippet_name, chord=False):
     # creates a LilyPond-snippet
-    print("snippet = \\relative c' {")
-    print(*notes)
+    print("{} = \\relative c' {{".format(snippet_name))
+    if chord == False:
+        print(*notes)
+    else:
+        print("<{}>".format(" ".join(notes)))
     print("}")
 
 if __name__ == "__main__":
@@ -216,7 +219,9 @@ if __name__ == "__main__":
     #print("c major scale midi: ", *get_notes(major_scale, "c", midi=True))
 
     print("LilyPond-Output (e hungarian scale):")
-    createLilyPond(get_notes(hungarian_minor_scale, "e"))
+    createLilyPond(get_notes(hungarian_minor_scale, "e"), "HungarianMinorScale")
+    print("LilyPond-Output (g major 7 chord):")
+    createLilyPond(get_notes(maj7_chord, "g"), "Gmaj", chord=True)
 
     #print("creating c-major.mid:")
     #writeMidi(get_notes(major_scale, "c", midi=True), "c-major.mid")
